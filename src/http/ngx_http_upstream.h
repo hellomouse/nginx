@@ -101,6 +101,13 @@ typedef struct {
     time_t                           fail_timeout;
     ngx_msec_t                       slow_start;
     ngx_uint_t                       down;
+#if (T_NGX_HTTP_UPSTREAM_ID)    
+    ngx_str_t                        id;
+#endif
+
+#if (T_NGX_HTTP_DYNAMIC_RESOLVE)
+    ngx_str_t                        host;
+#endif
 
     unsigned                         backup:1;
 
@@ -116,6 +123,9 @@ typedef struct {
 #define NGX_HTTP_UPSTREAM_DOWN          0x0010
 #define NGX_HTTP_UPSTREAM_BACKUP        0x0020
 #define NGX_HTTP_UPSTREAM_MAX_CONNS     0x0100
+#if (T_NGX_HTTP_UPSTREAM_ID)
+#define NGX_HTTP_UPSTREAM_ID            0x0040
+#endif
 
 
 struct ngx_http_upstream_srv_conf_s {
@@ -338,6 +348,9 @@ struct ngx_http_upstream_s {
     ngx_http_upstream_headers_in_t   headers_in;
 
     ngx_http_upstream_resolved_t    *resolved;
+#if (T_NGX_HTTP_DYNAMIC_RESOLVE)
+    ngx_resolver_ctx_t              *dyn_resolve_ctx;
+#endif
 
     ngx_buf_t                        from_client;
 

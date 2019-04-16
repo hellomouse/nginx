@@ -9,6 +9,10 @@
 #include <ngx_core.h>
 #include <ngx_http.h>
 
+#if (NGX_HTTP_UPSTREAM_CHECK)
+#include "ngx_http_upstream_check_module.h"
+#endif
+
 
 static ngx_int_t ngx_http_upstream_init_least_conn_peer(ngx_http_request_t *r,
     ngx_http_upstream_srv_conf_t *us);
