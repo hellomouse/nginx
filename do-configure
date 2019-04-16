@@ -1,0 +1,40 @@
+#!/bin/bash
+# do configure
+set -e
+
+function addDynamicModule() {
+    echo "--add-dynamic-module=modules/$1"
+}
+function addModule() {
+    echo "--add-module=modules/$1"
+}
+
+basedir=$(dirname $0)
+
+export PREFIX=${PREFIX:-/opt/nginx}
+
+# luajit for openresty lua module
+export LUAJIT_LIB=$basedir/luajit2/build/usr/local/lib
+export LUAJIT_INC=$basedir/luajit2/build/usr/local/include/luajit-2.1
+
+# NOTES
+# tengine modules are configured with defines
+
+auto/configure $@ --with-compat --prefix="$PREFIX" --user=www-data --group=www-data \
+	--with-file-aio --with-threads --with-http_v2_module --with-http_realip_module \
+	--with-http_geoip_module=dynamic --with-http_dav_module --with-http_stub_status_module \
+	--with-http_ssl_module --with-stream --with-stream_ssl_module \
+	--with-http_v3_module --with-quiche="$basedir/quiche" \
+	--with-cc-opt="-I$basedir/boringssl/include" \
+	--with-ld-opt="-L$basedir/boringssl/build/lib -Wl,-rpath,$PREFIX/lib" \
+	$(addDynamicModule ngx_http_dav_ext_module) \
+	$(addDynamicModule ngx_http_lua_module) \
+	$(addDynamicModule spnego-http-auth-nginx-module) \
+	$(addDynamicModule ngx_http_guess_mime_module) \
+	$(addDynamicModule ngx_http_postgres_auth_module) \
+	$(addDynamicModule ngx_rtmp_module) \
+	$(addModule ngx_http_reqstat_module) \
+	$(addModule ngx_http_upstream_consistent_hash_module) \
+	$(addModule ngx_http_upstream_check_module) \
+	$(addModule ngx_http_upstream_dynamic_module) \
+	$(addModule ngx_http_upstream_session_sticky_module)

@@ -354,6 +354,9 @@ ngx_http_do_read_client_request_body(ngx_http_request_t *r)
 
             rb->buf->last += n;
             r->request_length += n;
+#if (T_NGX_REQ_STATUS)
+            c->received += n;
+#endif
 
             if (n == rest) {
                 /* pass buffer to request body filter chain */
@@ -1122,6 +1125,36 @@ ngx_http_request_body_save_filter(ngx_http_request_t *r, ngx_chain_t *in)
     if (ngx_chain_add_copy(r->pool, &rb->bufs, in) != NGX_OK) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
+
+#if (T_NGX_INPUT_BODY_FILTER)
+    {
+    ngx_int_t                  rc;
+    ngx_chain_t               *cl;
+
+    for (cl = in; cl; cl = cl->next) {
+        rc = ngx_http_top_input_body_filter(r, cl->buf);
+        if (rc != NGX_OK) {
+            if (rc > NGX_OK && rc < NGX_HTTP_SPECIAL_RESPONSE) {
+                ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
+                              "input filter: return code 1xx or 2xx "
+                              "will cause trouble and is converted to 500");
+            }
+
+            /**
+             * NGX_OK: success and continue;
+             * NGX_ERROR: failed and exit;
+             * NGX_AGAIN: not ready and retry later.
+             */
+
+            if (rc < NGX_HTTP_SPECIAL_RESPONSE && rc != NGX_AGAIN) {
+                rc = NGX_HTTP_INTERNAL_SERVER_ERROR;
+            }
+
+            return rc;
+        }
+    }
+    }
+#endif
 
     if (r->request_body_no_buffering) {
         return NGX_OK;

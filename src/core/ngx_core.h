@@ -41,6 +41,9 @@ typedef void (*ngx_connection_handler_pt)(ngx_connection_t *c);
 #define  NGX_DONE       -4
 #define  NGX_DECLINED   -5
 #define  NGX_ABORT      -6
+#if (T_NGX_HTTP_DYNAMIC_RESOLVE)
+#define  NGX_YIELD      -7
+#endif
 
 
 #include <ngx_errno.h>
@@ -73,6 +76,7 @@ typedef void (*ngx_connection_handler_pt)(ngx_connection_t *c);
 #include <ngx_regex.h>
 #endif
 #include <ngx_radix_tree.h>
+#include <ngx_segment_tree.h>
 #include <ngx_times.h>
 #include <ngx_rwlock.h>
 #include <ngx_shmtx.h>
