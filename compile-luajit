@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+parallel=${parallel:-4}
+basedir=$(dirname $(realpath $0))/luajit2
+cd $basedir
+make -j $parallel
+mkdir -p build
+make DESTDIR=$PWD/build install
