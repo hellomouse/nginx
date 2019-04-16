@@ -1404,3 +1404,6 @@ cat << END                                    >> $NGX_MODULES_C
 };
 
 END
+
+have=T_NGX_INPUT_BODY_FILTER . auto/have
+have=T_NGX_HTTP_UPSTREAM_ID . auto/have

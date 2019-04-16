@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+# initialize all submodules
+git submodule update --init

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for patchfile in patches/*; do
+    patch -p1 -N -i $patchfile
+    ret=$?
+    [[ $ret -gt 1 ]] && exit $ret
+done
+exit 0

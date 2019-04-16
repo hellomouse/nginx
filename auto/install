@@ -144,6 +144,11 @@ install:	build $NGX_INSTALL_PERL_MODULES
 	cp conf/scgi_params \\
 		'\$(DESTDIR)$NGX_CONF_PREFIX/scgi_params.default'
 
+	test -f '\$(DESTDIR)$NGX_CONF_PREFIX/modules.conf' \\
+		|| cp conf/modules.conf '\$(DESTDIR)$NGX_CONF_PREFIX'
+	cp conf/modules.conf \\
+		'\$(DESTDIR)$NGX_CONF_PREFIX/modules.conf.default'
+
 	test -f '\$(DESTDIR)$NGX_CONF_PATH' \\
 		|| cp conf/nginx.conf '\$(DESTDIR)$NGX_CONF_PATH'
 	cp conf/nginx.conf '\$(DESTDIR)$NGX_CONF_PREFIX/nginx.conf.default'
@@ -215,4 +220,6 @@ upgrade:
 	test -f $NGX_PID_PATH.oldbin
 
 	kill -QUIT \`cat $NGX_PID_PATH.oldbin\`
+
+.PHONY: clean build install modules upgrade
 END

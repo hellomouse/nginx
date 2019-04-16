@@ -74,6 +74,15 @@ typedef struct {
     ngx_hash_t                       headers_in_hash;
     ngx_array_t                      upstreams;
                                              /* ngx_http_upstream_srv_conf_t */
+#if (NGX_HTTP_UPSTREAM_RBTREE)
+
+    ngx_list_t                       implicit_upstreams;
+                                            /* ngx_http_upstream_srv_conf_t */
+
+    ngx_rbtree_t                     rbtree;
+    ngx_rbtree_node_t                sentinel;
+
+#endif
 } ngx_http_upstream_main_conf_t;
 
 typedef struct ngx_http_upstream_srv_conf_s  ngx_http_upstream_srv_conf_t;
@@ -101,6 +110,13 @@ typedef struct {
     time_t                           fail_timeout;
     ngx_msec_t                       slow_start;
     ngx_uint_t                       down;
+#if (T_NGX_HTTP_UPSTREAM_ID)    
+    ngx_str_t                        id;
+#endif
+
+#if (T_NGX_HTTP_DYNAMIC_RESOLVE)
+    ngx_str_t                        host;
+#endif
 
     unsigned                         backup:1;
 
@@ -116,13 +132,23 @@ typedef struct {
 #define NGX_HTTP_UPSTREAM_DOWN          0x0010
 #define NGX_HTTP_UPSTREAM_BACKUP        0x0020
 #define NGX_HTTP_UPSTREAM_MAX_CONNS     0x0100
+#define NGX_HTTP_UPSTREAM_ID            0x0040
 
 
 struct ngx_http_upstream_srv_conf_s {
+#if (NGX_HTTP_UPSTREAM_RBTREE)
+    ngx_rbtree_node_t                node;
+#endif
     ngx_http_upstream_peer_t         peer;
     void                           **srv_conf;
 
     ngx_array_t                     *servers;  /* ngx_http_upstream_server_t */
+
+#if (NGX_HTTP_UPSTREAM_HASH)
+    ngx_array_t                     *values;
+    ngx_array_t                     *lengths;
+    ngx_uint_t                       retries;
+#endif
 
     ngx_uint_t                       flags;
     ngx_str_t                        host;
@@ -152,6 +178,7 @@ typedef struct {
     ngx_msec_t                       connect_timeout;
     ngx_msec_t                       send_timeout;
     ngx_msec_t                       read_timeout;
+    ngx_msec_t                       timeout;
     ngx_msec_t                       next_upstream_timeout;
 
     size_t                           send_lowat;
@@ -338,6 +365,9 @@ struct ngx_http_upstream_s {
     ngx_http_upstream_headers_in_t   headers_in;
 
     ngx_http_upstream_resolved_t    *resolved;
+#if (T_NGX_HTTP_DYNAMIC_RESOLVE)
+    ngx_resolver_ctx_t              *dyn_resolve_ctx;
+#endif
 
     ngx_buf_t                        from_client;
 
@@ -396,6 +426,14 @@ struct ngx_http_upstream_s {
     unsigned                         request_body_sent:1;
     unsigned                         request_body_blocked:1;
     unsigned                         header_sent:1;
+
+#if (T_NGX_MULTI_UPSTREAM)
+    unsigned                         multi:1;
+    void                            *multi_init;
+    ngx_pool_t                      *send_pool;
+    ngx_flag_t                       multi_mode;
+#endif
+
 };
 
 
@@ -428,6 +466,23 @@ ngx_int_t ngx_http_upstream_hide_headers_hash(ngx_conf_t *cf,
 #define ngx_http_conf_upstream_srv_conf(uscf, module)                         \
     uscf->srv_conf[module.ctx_index]
 
+#if (NGX_HTTP_UPSTREAM_CHECK)
+
+ngx_uint_t ngx_http_upstream_check_add_peer(ngx_conf_t *cf,
+    ngx_http_upstream_srv_conf_t *us, ngx_addr_t *peer);
+
+ngx_uint_t ngx_http_upstream_check_peer_down(ngx_uint_t index);
+ngx_uint_t ngx_http_upstream_check_upstream_down(ngx_str_t *upstream);
+
+void ngx_http_upstream_check_get_peer(ngx_uint_t index);
+void ngx_http_upstream_check_free_peer(ngx_uint_t index);
+
+ngx_uint_t ngx_http_upstream_check_add_dynamic_peer(ngx_pool_t *pool,
+    ngx_http_upstream_srv_conf_t *us, ngx_addr_t *peer);
+void ngx_http_upstream_check_delete_dynamic_peer(ngx_str_t *name,
+     ngx_addr_t *peer_addr);
+
+#endif
 
 extern ngx_module_t        ngx_http_upstream_module;
 extern ngx_conf_bitmask_t  ngx_http_upstream_cache_method_mask[];

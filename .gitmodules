@@ -1,0 +1,36 @@
+[submodule "modules/ngx_http_lua_module"]
+	path = modules/ngx_http_lua_module
+	url = https://github.com/openresty/lua-nginx-module
+[submodule "modules/ngx_http_dav_ext_module"]
+	path = modules/ngx_http_dav_ext_module
+	url = https://github.com/arut/nginx-dav-ext-module
+[submodule "modules/spnego-http-auth-nginx-module"]
+	path = modules/spnego-http-auth-nginx-module
+	url = https://github.com/stnoonan/spnego-http-auth-nginx-module
+[submodule "modules/ngx_http_guess_mime_module"]
+	path = modules/ngx_http_guess_mime_module
+	url = https://github.com/ohnx/nginx-guess-mime
+[submodule "tengine"]
+	path = tengine
+	url = https://github.com/alibaba/tengine
+[submodule "luajit2"]
+	path = luajit2
+	url = https://github.com/openresty/luajit2
+[submodule "lua-resty/lua-resty-lrucache"]
+	path = lua-resty/lua-resty-lrucache
+	url = https://github.com/openresty/lua-resty-lrucache
+[submodule "lua-resty/lua-resty-core"]
+	path = lua-resty/lua-resty-core
+	url = https://github.com/openresty/lua-resty-core
+[submodule "modules/ngx_rtmp_module"]
+	path = modules/ngx_rtmp_module
+	url = https://github.com/hellomouse/nginx-rtmp-module
+[submodule "quiche"]
+	path = quiche
+	url = https://github.com/cloudflare/quiche/
+[submodule "boringssl"]
+	path = boringssl
+	url = https://github.com/google/boringssl
+[submodule "modules/ngx_http_fancyindex_module"]
+	path = modules/ngx_http_fancyindex_module
+	url = https://github.com/aperezdc/ngx-fancyindex

@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+export PREFIX=${PREFIX:-/opt/nginx}
+basedir=$(dirname $(realpath $0))/boringssl
+
+cd $basedir
+mkdir -p build
+cd build
+cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1 ..
+ninja
+mkdir -p lib
+cp crypto/libcrypto.so ssl/libssl.so lib/

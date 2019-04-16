@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+basedir=$(dirname $(realpath $0))
+export PREFIX=${PREFIX:-/opt/nginx}
+mkdir -p $PREFIX/lib
+mkdir -p $PREFIX/lib/lua
+mkdir -p $PREFIX/lib/luac
+
+cd $basedir
+make install
+
+cd $basedir/lua-resty/lua-resty-core
+make PREFIX=$PREFIX install
+
+cd $basedir/lua-resty/lua-resty-lrucache
+make PREFIX=$PREFIX install
+
+cd $basedir/luajit2/build/usr/local/lib
+cp --no-dereference libluajit-*.so* $PREFIX/lib/
+
+cd $basedir/boringssl/build/lib
+cp --no-dereference libcrypto.so libssl.so $PREFIX/lib/
